@@ -6,8 +6,8 @@ const { FigmaApi } = require('../figma-api');
 
 const {
   iconsFileKey,
-  iconsPageId,
   iconsFolder,
+  iconsFramesIds,
   personalAccessToken,
   tempIconsFolder,
 } = require('./icons.config');
@@ -16,17 +16,17 @@ const figmaApi = new FigmaApi({ personalAccessToken });
 
 const tasks = new Listr([
   {
-    title: 'Запрос информации о файле',
+    title: 'Запрос информации об иконках',
     task: async ctx => {
       const { components } = await figmaApi.getFile(iconsFileKey, {
-        ids: [iconsPageId],
-        depth: 2,
+        ids: iconsFramesIds,
+        depth: 1,
       });
       ctx.components = components;
     }
   },
   {
-    title: 'Запрос изображений компонентов в формате svg',
+    title: 'Запрос изображений иконок в формате svg',
     task: async ctx => {
       const { components } = ctx;
       const { images } = await figmaApi.getImage(iconsFileKey, {
@@ -37,7 +37,7 @@ const tasks = new Listr([
     }
   },
   {
-    title: 'Загрузка svg исходников для каждого компонента',
+    title: 'Загрузка svg-исходников иконок',
     task: async ctx => {
       const { components, images } = ctx;
       const sources = await Promise.all(
@@ -52,7 +52,7 @@ const tasks = new Listr([
     }
   },
   {
-    title: 'Создание svg файлов во временной папке temp_icons',
+    title: 'Сохранение иконок во временной папке',
     task: async ctx => {
       const { sources } = ctx;
       await Promise.all(
@@ -63,7 +63,7 @@ const tasks = new Listr([
     }
   },
   {
-    title: 'Перемещение временной папки в основную',
+    title: 'Замена основной папки с иконками временной папкой',
     task: async () => {
       await fs.move(tempIconsFolder, iconsFolder, { overwrite: true });
     }
