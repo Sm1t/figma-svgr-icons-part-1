@@ -20,7 +20,7 @@ const tasks = new Listr([
     task: async ctx => {
       const { components } = await figmaApi.getFile(iconsFileKey, {
         ids: iconsFramesIds,
-        depth: 1,
+        depth: 3,
       });
       ctx.components = components;
     }
